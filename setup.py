@@ -31,7 +31,7 @@ setup_args = dict(
     keywords        = ['Jupyter', 'Packaging'],
     cmdclass        = create_cmdclass(),
     python_requires = '>=3.6',
-    install_requires = ["packaging", "tomlkit"],
+    install_requires = ["packaging", "tomlkit", "setuptools>=40.8.0", "wheel", "deprecation"],
     extras_require  = {
         'test': [
             'pytest'

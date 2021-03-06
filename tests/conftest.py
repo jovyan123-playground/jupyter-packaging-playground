@@ -13,13 +13,13 @@ def pyproject_toml():
     root_path = HERE.joinpath("../..").resolve()
     return """
 [build-system]
-requires = ["jupyter_packaging@file://%s", "setuptools>=40.8.0", "wheel"]
+requires = ["jupyter_packaging@file://%s", "setuptools"]
 build-backend = "setuptools.build_meta"
 """ % str(root_path).replace(os.sep, '/')
 
 
 setup = lambda name="jupyter_packaging_test_foo", data_files_spec=None, **kwargs: """
-from jupyter_packaging import create_cmdclass
+from jupyter_packaging import get_data_files
 import setuptools
 import os
 
@@ -30,10 +30,7 @@ name = "{name}"
 def exclude(filename):
     return os.path.basename(filename) == "exclude.py"
 
-cmdclass = create_cmdclass(
-    data_files_spec={data_files_spec},
-    exclude=exclude
-)
+data_files=get_data_files({data_files_spec}, exclude=exclude)
 
 setup_args = dict(
     name=name,

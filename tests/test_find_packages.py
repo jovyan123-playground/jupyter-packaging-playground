@@ -1,6 +1,7 @@
 
 import os
 
+from deprecation import fail_if_not_removed
 import pytest
 
 from jupyter_packaging.setupbase import find_packages
@@ -10,6 +11,7 @@ here = os.path.dirname(__file__)
 root = os.path.join(here, os.pardir)
 
 
+@fail_if_not_removed
 def test_finds_itself():
     with pytest.warns(DeprecationWarning):
         assert ['jupyter_packaging'] == find_packages(root)
