@@ -40,7 +40,7 @@ setup_args = dict(
     description="foo package",
     long_description="long_description",
     long_description_content_type="text/markdown",
-    cmdclass= cmdclass,
+    data_files= data_files,
     zip_safe=False,
     include_package_data=True,
     {setup_args}
