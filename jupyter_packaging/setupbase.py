@@ -22,7 +22,11 @@ from shutil import which
 import subprocess
 import sys
 
-from deprecation import deprecated
+try:
+    from deprecation import deprecated
+except ImportError:
+    # shim deprecated to allow setuptools to find the version string in this file
+    deprecated = lambda *args, **kwargs: lambda *args, **kwargs: None
 
 # BEFORE importing distutils, remove MANIFEST. distutils doesn't properly
 # update it when the contents of directories change.

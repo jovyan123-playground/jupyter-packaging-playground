@@ -13,7 +13,7 @@ def pyproject_toml():
     root_path = HERE.joinpath("../..").resolve()
     return """
 [build-system]
-requires = ["jupyter_packaging@file://%s", "setuptools"]
+requires = ["jupyter_packaging@file://%s", "setuptools>=40.8.0", "wheel"]
 build-backend = "setuptools.build_meta"
 """ % str(root_path).replace(os.sep, '/')
 
