@@ -20,6 +20,7 @@ import re
 import shlex
 from shutil import which
 import subprocess
+from setuptools.config import StaticModule
 import sys
 import warnings
 
@@ -187,11 +188,18 @@ def get_data_files(data_specs, existing, *, top=None, exclude=None):
     return _get_data_files(data_specs, existing, top=top, exclude=exclude)
 
 
-def get_version(file, name='__version__'):
-    """Get the version of the package from the given file by
-    executing it and extracting the given `name`.
+def get_version(fpath, name='__version__'):
+    """Get the version of the package from the given file by extracting the given `name`.
     """
-    path = os.path.realpath(file)
+    # Try to get it from a static import first
+    try:
+
+        module = StaticModule(fpath.replace(os.sep, '.').replace('.py', ''))
+        return getattr(module, name)
+    except Exception as e:
+        pass
+
+    path = os.path.realpath(fpath)
     version_ns = {}
     with io.open(path, encoding="utf8") as f:
         exec(f.read(), {}, version_ns)
@@ -516,7 +524,7 @@ def install_npm(path=None, build_dir=None, source_dir=None, build_cmd='build',
         'Deprecated, please use `npm_builder` and `wrap_installers` to handle cmdclass interation',
         category=DeprecationWarning
     )
-    builder = npm_builder(path=path, build_dir=build_dir=, source_dir=source_dir, build_dir=build_cmd, force=force, npm=npm)
+    builder = npm_builder(path=path, build_dir=build_dir, source_dir=source_dir, build_cmd=build_cmd, force=force, npm=npm)
 
     class NPM(BaseCommand):
         description = 'install package.json dependencies using npm'
