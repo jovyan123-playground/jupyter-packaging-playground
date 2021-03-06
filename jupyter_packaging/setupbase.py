@@ -93,7 +93,7 @@ def npm_builder(path=None, build_dir=None, source_dir=None, build_cmd='build',
 
     Returns
     -------
-    A build function to use with `make_cmdclass`
+    A build function to use with `wrap_installers`
     """
     def builder():
         if skip_npm:
@@ -131,8 +131,20 @@ def npm_builder(path=None, build_dir=None, source_dir=None, build_cmd='build',
     return builder
 
 
-def make_cmdclass(build_func, name='prebuild'):
-    """Make a setuptools cmdclass that calls a prebuild function before installing."""
+def wrap_installers(build_func, name='prebuild'):
+    """Make a setuptools cmdclass that calls a prebuild function before installing.
+
+    Parameters
+    ----------
+    build_func : function
+        The function to call in the prebuild step
+    name : str, optional
+        The name of the command to add for the prebuild step
+
+    Returns
+    -------
+    A cmdclass dictionary for setup args.
+    """
     cmdclass = {}
 
     class Prebuild(BaseCommand):
@@ -211,53 +223,6 @@ def is_stale(target, source):
     return compare_recursive_mtime(source, cutoff=target_mtime)
 
 
-def compare_recursive_mtime(path, cutoff, newest=True):
-    """Compare the newest/oldest mtime for all files in a directory.
-
-    Cutoff should be another mtime to be compared against. If an mtime that is
-    newer/older than the cutoff is found it will return True.
-    E.g. if newest=True, and a file in path is newer than the cutoff, it will
-    return True.
-    """
-    if os.path.isfile(path):
-        mt = mtime(path)
-        if newest:
-            if mt > cutoff:
-                return True
-        elif mt < cutoff:
-            return True
-    for dirname, _, filenames in os.walk(path, topdown=False):
-        for filename in filenames:
-            mt = mtime(pjoin(dirname, filename))
-            if newest:  # Put outside of loop?
-                if mt > cutoff:
-                    return True
-            elif mt < cutoff:
-                return True
-    return False
-
-
-def recursive_mtime(path, newest=True):
-    """Gets the newest/oldest mtime for all files in a directory."""
-    if os.path.isfile(path):
-        return mtime(path)
-    current_extreme = None
-    for dirname, dirnames, filenames in os.walk(path, topdown=False):
-        for filename in filenames:
-            mt = mtime(pjoin(dirname, filename))
-            if newest:  # Put outside of loop?
-                if mt >= (current_extreme or mt):
-                    current_extreme = mt
-            elif mt <= (current_extreme or mt):
-                current_extreme = mt
-    return current_extreme
-
-
-def mtime(path):
-    """shorthand for mtime"""
-    return os.stat(path).st_mtime
-
-
 class BaseCommand(Command):
     """Empty command because Command needs subclasses to override too much"""
     user_options = []
@@ -277,9 +242,7 @@ class BaseCommand(Command):
 
 def combine_commands(*commands):
     """Return a Command that combines several commands."""
-    class CombinedCommand(Command):
-        user_options = []
-
+    class CombinedCommand(BaseCommand):
         def initialize_options(self):
             self.commands = []
             for C in commands:
@@ -325,7 +288,7 @@ def ensure_python(specs):
 def skip_if_exists(paths, CommandClass):
     """Skip a command if list of paths exists."""
     warnings.warn(
-        'Deprecated, please use `setuptools.find_packages`',
+        'Deprecated, will be removed in 1.0',
         category=DeprecationWarning
     )
     def should_skip():
@@ -364,7 +327,7 @@ def find_packages(top):
 def update_package_data(distribution):
     """update build_py options to get package_data changes"""
     warnings.warn(
-        'Deprecated, please use `make_cmdclass` to handle cmdclass interation',
+        'Deprecated, please use `wrap_installers` to handle cmdclass interation',
         category=DeprecationWarning
     )
     build_py = distribution.get_command_obj('build_py')
@@ -379,11 +342,70 @@ class bdist_egg_disabled(bdist_egg):
     """
     def run(self):
         warnings.warn(
-            'Deprecated, please use `make_cmdclass` to handle cmdclass interation',
+            'Deprecated, please use `wrap_installers` to handle cmdclass interation',
             category=DeprecationWarning
         )
         sys.exit("Aborting implicit building of eggs. Use `pip install .` "
                  " to install from source.")
+
+
+def compare_recursive_mtime(path, cutoff, newest=True):
+    """Compare the newest/oldest mtime for all files in a directory.
+
+    Cutoff should be another mtime to be compared against. If an mtime that is
+    newer/older than the cutoff is found it will return True.
+    E.g. if newest=True, and a file in path is newer than the cutoff, it will
+    return True.
+    """
+    warnings.warn(
+        'This will become a private function in 1.0',
+        category=DeprecationWarning
+    )
+    if os.path.isfile(path):
+        mt = mtime(path)
+        if newest:
+            if mt > cutoff:
+                return True
+        elif mt < cutoff:
+            return True
+    for dirname, _, filenames in os.walk(path, topdown=False):
+        for filename in filenames:
+            mt = mtime(pjoin(dirname, filename))
+            if newest:  # Put outside of loop?
+                if mt > cutoff:
+                    return True
+            elif mt < cutoff:
+                return True
+    return False
+
+
+def recursive_mtime(path, newest=True):
+    """Gets the newest/oldest mtime for all files in a directory."""
+    warnings.warn(
+        'This will become a private function in 1.0',
+        category=DeprecationWarning
+    )
+    if os.path.isfile(path):
+        return mtime(path)
+    current_extreme = None
+    for dirname, dirnames, filenames in os.walk(path, topdown=False):
+        for filename in filenames:
+            mt = mtime(pjoin(dirname, filename))
+            if newest:  # Put outside of loop?
+                if mt >= (current_extreme or mt):
+                    current_extreme = mt
+            elif mt <= (current_extreme or mt):
+                current_extreme = mt
+    return current_extreme
+
+
+def mtime(path):
+    """shorthand for mtime"""
+    warnings.warn(
+        'This will become a private function in 1.0',
+        category=DeprecationWarning
+    )
+    return os.stat(path).st_mtime
 
 
 def create_cmdclass(prerelease_cmd=None, package_data_spec=None,
@@ -423,7 +445,7 @@ def create_cmdclass(prerelease_cmd=None, package_data_spec=None,
     e.g. `('share/foo/bar', 'pkgname/bizz, '*')`
     """
     warnings.warn(
-        'Deprecated, please use `make_cmdclass` to handle cmdclass interation',
+        'Deprecated, please use `wrap_installers` to handle cmdclass interation',
         category=DeprecationWarning
     )
     wrapped = [prerelease_cmd] if prerelease_cmd else []
@@ -458,7 +480,7 @@ def create_cmdclass(prerelease_cmd=None, package_data_spec=None,
 def command_for_func(func):
     """Create a command that calls the given function."""
     warnings.warn(
-        'Deprecated, please use `make_cmdclass` to handle cmdclass interation',
+        'Deprecated, please use `wrap_installers` to handle cmdclass interation',
         category=DeprecationWarning
     )
     class FuncCommand(BaseCommand):
@@ -491,7 +513,7 @@ def install_npm(path=None, build_dir=None, source_dir=None, build_cmd='build',
         The npm executable name, or a tuple of ['node', executable].
     """
     warnings.warn(
-        'Deprecated, please use `npm_builder` and `make_cmdclass` to handle cmdclass interation',
+        'Deprecated, please use `npm_builder` and `wrap_installers` to handle cmdclass interation',
         category=DeprecationWarning
     )
     builder = npm_builder(path=path, build_dir=build_dir=, source_dir=source_dir, build_dir=build_cmd, force=force, npm=npm)
