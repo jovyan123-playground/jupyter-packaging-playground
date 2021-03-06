@@ -56,9 +56,9 @@ data_files_combinations = [
     'source,spec,target',
     data_files_combinations
 )
-def test_develop(make_package, source,spec,target):
+def test_develop(make_package_deprecated, source,spec,target):
     name = 'jupyter_packaging_test_foo'
-    package_dir = make_package(name=name, data_files=source, data_files_spec=[spec])
+    package_dir = make_package_deprecated(name=name, data_files=source, data_files_spec=[spec])
     target_path = pathlib.Path(sys.base_prefix).joinpath(target)
     if target_path.exists():
         shutil.rmtree(str(target_path.parent))
