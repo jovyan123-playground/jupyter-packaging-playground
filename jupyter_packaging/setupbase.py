@@ -183,6 +183,9 @@ def wrap_installers(build_func, *, wrap_develop=True, wrap_dist=True):
         cmdclass[name] = _make_wrapper(command)
     return cmdclass
 
+# ---------------------------------------------------------------------------
+# Utility Functions
+# ---------------------------------------------------------------------------
 
 def get_data_files(data_specs, *, top=None, exclude=None):
     """Expand data file specs into valid data files metadata.
@@ -204,10 +207,6 @@ def get_data_files(data_specs, *, top=None, exclude=None):
     """
     return _get_data_files(data_specs, None, top=top, exclude=exclude)
 
-
-# ---------------------------------------------------------------------------
-# Utility Functions
-# ---------------------------------------------------------------------------
 
 def get_version(fpath, name='__version__'):
     """Get the version of the package from the given file by extracting the given `name`.
@@ -235,7 +234,7 @@ def run(cmd, **kwargs):
         cmd = shlex.split(cmd)
     cmd_path = which(cmd[0])
     if not cmd_path:
-        sys.exit("Aborting. Could not find cmd (%s) in path. "
+        raise ValueError("Aborting. Could not find cmd (%s) in path. "
                  "If command is not expected to be in user's path, "
                  "use an absolute path." % cmd[0])
     cmd[0] = cmd_path
@@ -287,6 +286,7 @@ def combine_commands(*commands):
             for c in self.commands:
                 c.run()
     return CombinedCommand
+
 
 def compare_recursive_mtime(path, cutoff, newest=True):
     """Compare the newest/oldest mtime for all files in a directory.
@@ -377,6 +377,12 @@ def ensure_targets(targets):
     return TargetsCheck
 
 
+# ---------------------------------------------------------------------------
+# Deprecated Functions
+# ---------------------------------------------------------------------------
+
+@deprecated(deprecated_in="0.8", removed_in="1.0", current_version=__version__,
+            details="Use `BaseCommand` directly instead")
 def command_for_func(func):
     """Create a command that calls the given function."""
     class FuncCommand(BaseCommand):
@@ -387,9 +393,6 @@ def command_for_func(func):
 
     return FuncCommand
 
-# ---------------------------------------------------------------------------
-# Deprecated Functions
-# ---------------------------------------------------------------------------
 
 @deprecated(deprecated_in="0.7", removed_in="1.0", current_version=__version__,
             details="Use `setuptools` `python_requires` instead")

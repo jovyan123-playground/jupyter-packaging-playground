@@ -3,7 +3,18 @@ import os
 import pytest
 from unittest.mock import patch, call
 
-from jupyter_packaging.setupbase import npm_builder
+from jupyter_packaging.setupbase import npm_builder, wrap_installers
+
+
+def test_wrap_installers():
+    called = False
+    def func():
+        nonlocal called
+        called = True
+
+    cmd_class = wrap_installers(func)
+    cmd_class['pre_sdist'](Distribution()).run()
+    assert called
 
 
 def test_npm_builder():

@@ -32,7 +32,7 @@ def test_subdir_relative_path(tmpdir):
     tmpdir.mkdir('sub1').join('a.json').write('')
     tmpdir.mkdir('sub2').join('b.json').write('')
     spec = [
-        ('my/target', 'sub1', '**/*.json')
+        ('my/target', 'sub1', '**/[a-z].json')
     ]
     res = get_data_files(spec, top=str(tmpdir))
     assert sorted(res) == [

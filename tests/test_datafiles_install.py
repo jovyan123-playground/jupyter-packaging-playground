@@ -23,7 +23,7 @@ data_files_combinations = [
         # data file source
         ("share/test.txt",),
         # data file spec
-        ("jupyter-packaging-test/level1", "share", "**/*"),
+        ("jupyter-packaging-test/level1", "share", "**/[a-z]est.txt"),
         # data file target
         "jupyter-packaging-test/level1/test.txt"
     ),
