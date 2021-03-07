@@ -8,6 +8,9 @@ class TestCommand(BaseCommand):
     def run(self):
       raise RuntimeError()
 
+# Prevent pytest from trying to collect TestCommand as a test:
+TestCommand.__test__ = False
+
 
 def test_skip_existing(destination_dir):
     local_targets = ['file1.rtf', 'sub/subfile1.rtf']

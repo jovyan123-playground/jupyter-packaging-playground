@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 import functools
+import importlib
 from pathlib import Path
 
 from setuptools.build_meta import (
@@ -44,6 +45,9 @@ def _get_build_func():
     if 'func' not in section['builder']:
         raise ValueError('Missing `func` specifier for builder')
 
-    builder = section['builder']['func']
+    func_data = section['builder']['func']
+    mod_name, _, func_name = func_data.rpartition('.')
+    mod = importlib.import_module(mod_name)
+    func = getattr(mod, func_name)
     kwargs = section.get('build-args', {})
-    return functools.partial(builder, **kwargs)
+    return functools.partial(func, **kwargs)

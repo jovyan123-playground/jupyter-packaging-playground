@@ -6,6 +6,8 @@ import shutil
 import pathlib
 import sys
 
+from deprecation import fail_if_not_removed
+
 
 
 data_files_combinations = [
@@ -52,6 +54,8 @@ data_files_combinations = [
 
 ]
 
+
+@fail_if_not_removed
 @pytest.mark.parametrize(
     'source,spec,target',
     data_files_combinations

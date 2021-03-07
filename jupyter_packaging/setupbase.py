@@ -387,7 +387,7 @@ def command_for_func(func):
 # Deprecated Functions
 # ---------------------------------------------------------------------------
 
-@deprecated(deprecated_in="0.8", removed_in="1.0",
+@deprecated(deprecated_in="0.7", removed_in="1.0", current_version=__version__,
             details="Use `setuptools` `python_requires` instead")
 def ensure_python(specs):
     """Given a list of range specifiers for python, ensure compatibility.
@@ -407,7 +407,7 @@ def ensure_python(specs):
     raise ValueError('Python version %s unsupported' % part)
 
 
-@deprecated(deprecated_in="0.8", removed_in="1.0",
+@deprecated(deprecated_in="0.7", removed_in="1.0", current_version=__version__,
             details="Use `setuptools.find_packages` instead")
 def find_packages(top):
     """
@@ -417,7 +417,7 @@ def find_packages(top):
     return fp(top)
 
 
-@deprecated(deprecated_in="0.8", removed_in="1.0",
+@deprecated(deprecated_in="0.8", removed_in="1.0", current_version=__version__,
             details="Use `use_package_data=True` and `MANIFEST.in` instead")
 def update_package_data(distribution):
     """update build_py options to get package_data changes"""
@@ -425,7 +425,7 @@ def update_package_data(distribution):
     build_py.finalize_options()
 
 
-@deprecated(deprecated_in="0.8", removed_in="1.0",
+@deprecated(deprecated_in="0.8", removed_in="1.0", current_version=__version__,
             details="Not needed")
 class bdist_egg_disabled(bdist_egg):
     """Disabled version of bdist_egg
@@ -438,7 +438,7 @@ class bdist_egg_disabled(bdist_egg):
                  " to install from source.")
 
 
-@deprecated(deprecated_in="0.8", removed_in="1.0",
+@deprecated(deprecated_in="0.8", removed_in="1.0", current_version=__version__,
             details=""""
 Use `wrap_installers` to handle prebuild steps in cmdclass.
 Use `get_data_files` to handle data files.
@@ -509,7 +509,7 @@ def create_cmdclass(prerelease_cmd=None, package_data_spec=None,
     return cmdclass
 
 
-@deprecated(deprecated_in="0.8", removed_in="1.0",
+@deprecated(deprecated_in="0.8", removed_in="1.0", current_version=__version__,
             details="Use `npm_builder` and `wrap_installers`")
 def install_npm(path=None, build_dir=None, source_dir=None, build_cmd='build',
                 force=False, npm=None):

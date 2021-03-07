@@ -75,8 +75,7 @@ def make_package_base(tmp_path, pyproject_toml, setup_func=setup_maker):
         name="jupyter_packaging_test_foo",
         data_files=None,
         data_files_spec=None,
-        py_module=False,
-        setup_func = setup_maker
+        py_module=False
     ):
         # Create the package directory.
         pkg = tmp_path.joinpath('package')
