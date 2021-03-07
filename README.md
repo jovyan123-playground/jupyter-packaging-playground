@@ -10,7 +10,9 @@ Tools to help build and install Jupyter Python packages that require a pre-build
 
 There are three ways to use `jupyter-packaging` in another package.
 
-1. Use a `pyproject.toml` file as outlined in [pep-518](https://www.python.org/dev/peps/pep-0518/).
+### As a Build Requirement
+
+Use a `pyproject.toml` file as outlined in [pep-518](https://www.python.org/dev/peps/pep-0518/).
 An example:
 
 ```toml
@@ -36,7 +38,9 @@ except ImportError:
 setup(cmdclass=cmdclass))
 ```
 
-2. Use the `jupyter_packaging` build backend.
+### As a Build Backend
+
+Use the `jupyter_packaging` build backend.
 The pre-build command is specified as metadata in `pyproject.toml`:
 
 ```toml
@@ -80,7 +84,9 @@ except ImportError:
 setup(cmdclass=cmdclass))
 ```
 
-3. Vendor `setupbase.py` locally alongside `setup.py` and import the module directly.
+### As a Vendored File
+
+Vendor `setupbase.py` locally alongside `setup.py` and import the module directly.
 
 ```py
 import setuptools
