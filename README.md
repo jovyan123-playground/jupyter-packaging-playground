@@ -58,6 +58,12 @@ from setuptools import setup
 setup()
 ```
 
+The `tool.jupyter-packaging.builder` section expects a `func` value that points to an importable
+module and a function with dot separators.  If not given, no pre-build function will run.
+
+The optional `tool.jupyter-packaging.build-args` sections accepts a dict of keyword arguments to
+give to the pre-build command.
+
 The build backend does not handle the `develop` command (`pip install -e .`).
 If desired, you can wrap just that command (note the use of `wrap_dist=False`):
 

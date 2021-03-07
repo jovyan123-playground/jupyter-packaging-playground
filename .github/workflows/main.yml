@@ -30,7 +30,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install -U pip
+        python -m pip install -U pip codecov
         pip install -e .[test]
 
     - name: Run test
