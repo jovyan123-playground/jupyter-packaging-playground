@@ -19,7 +19,10 @@ requires = ["jupyter_packaging~=0.8.0"]
 build-backend = "setuptools.build_meta"
 ```
 
-Below is an example `setup.py` that uses the `pyproject.toml` approach.  It assumes the rest of your metadata is in [`setup.cfg`](https://setuptools.readthedocs.io/en/latest/userguide/declarative_config.html):
+Below is an example `setup.py` using the above config.
+It assumes the rest of your metadata is in [`setup.cfg`](https://setuptools.readthedocs.io/en/latest/userguide/declarative_config.html).
+We wrap the import in a try/catch to allow the file to be run without `jupyter_packaging`
+so that `python setup.py` can be run directly when not building.
 
 ```py
 from setuptools import setup
@@ -82,9 +85,10 @@ setup(cmdclass=cmdclass)
 
 ## Usage Notes
 
-- We recommend using `include_package_data=True` and `MANIFEST.in` to control the assets used in the [dist files](https://setuptools.readthedocs.io/en/latest/userguide/datafiles.html).
-- Tools like [`check-manifest`](https://github.com/mgedmin/check-manifest) or [`manifix`](https://github.com/vidartf/manifix) can be used to ensure the desired assets are shipped.
-- Python `data_files` are not supported in `develop` mode.  You can work around this limitation by doing a full install (`pip install .`) before the develop install (`pip install -e .`), or by adding a script to push the data files to `sys.base_prefix`.
+- We recommend using `include_package_data=True` and `MANIFEST.in` to control the assets included in the [package](https://setuptools.readthedocs.io/en/latest/userguide/datafiles.html).
+- Tools like [`check-manifest`](https://github.com/mgedmin/check-manifest) or [`manifix`](https://github.com/vidartf/manifix) can be used to ensure the desired assets are included.
+- Simple uses of `data_files` can be handled in `setup.cfg` or in `setup.py`.  If recursive directories are needed use `get_data_files()` from this package.
+- Unfortunately `data_files` are not supported in `develop` mode (a limitation of `setuptools`).  You can work around it by doing a full install (`pip install .`) before the develop install (`pip install -e .`), or by adding a script to push the data files to `sys.base_prefix`.
 
 
 ## Development Install
@@ -103,4 +107,4 @@ requires = ["jupyter_packaging@file://<path-to-git-checkout>"]
 build-backend = "setuptools.build_meta"
 ```
 
-Note that you need to run `pip cache remove jupyter_packaging` any time changes are made to prevent `pip` from using a previous source version.
+Note: you need to run `pip cache remove jupyter_packaging` any time changes are made to prevent `pip` from using a cached version of the source.

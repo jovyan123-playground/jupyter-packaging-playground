@@ -76,6 +76,54 @@ else:
 # Core Functions
 # ---------------------------------------------------------------------------
 
+def wrap_installers(build_func, *, wrap_develop=True, wrap_dist=True):
+    """Make a setuptools cmdclass that calls a prebuild function before installing.
+
+    Parameters
+    ----------
+    build_func : function
+        The function to call in the prebuild step
+    wrap_develop: bool, optional
+        Whether to wrap the develop command.
+    wrap_dist: bool, optional
+        Whether to wrap the dist commands.
+
+    Notes
+    -----
+    For any wrapped command, creates a new `pre_` command that can be run separately.
+    These would be `pre_develop`, `pre_sdist`, and `pre_bdist_wheel`.
+
+    Returns
+    -------
+    A cmdclass dictionary for setup args.
+    """
+    cmdclass = {}
+
+    for command in [develop, sdist, bdist_wheel]:
+        if command == develop and not wrap_develop:
+            continue
+        if command in [sdist, bdist_wheel] and not wrap_dist:
+            continue
+
+        name = command.__name__
+        prename = f'pre_{name}'
+
+        class Prebuild(BaseCommand):
+            def run(self):
+                build_func()
+
+        cmdclass[prename] = Prebuild
+
+        def _make_wrapper(klass):
+            class _Wrapped(klass):
+                def run(self):
+                    self.run_command(prename)
+                    klass.run(self)
+            return _Wrapped
+        cmdclass[name] = _make_wrapper(command)
+    return cmdclass
+
+
 def npm_builder(path=None, build_dir=None, source_dir=None, build_cmd='build',
                 force=False, npm=None):
     """Create a build function for managing an npm installation.
@@ -134,54 +182,6 @@ def npm_builder(path=None, build_dir=None, source_dir=None, build_cmd='build',
             if build_cmd:
                 run(npm_cmd + ['run', build_cmd], cwd=node_package)
     return builder
-
-
-def wrap_installers(build_func, *, wrap_develop=True, wrap_dist=True):
-    """Make a setuptools cmdclass that calls a prebuild function before installing.
-
-    Parameters
-    ----------
-    build_func : function
-        The function to call in the prebuild step
-    wrap_develop: bool, optional
-        Whether to wrap the develop command.
-    wrap_dist: bool, optional
-        Whether to wrap the dist commands.
-
-    Notes
-    -----
-    For any wrapped command, creates a new `pre_` command that can be run separately.
-    These would be `pre_develop`, `pre_sdist`, and `pre_bdist_wheel`.
-
-    Returns
-    -------
-    A cmdclass dictionary for setup args.
-    """
-    cmdclass = {}
-
-    for command in [develop, sdist, bdist_wheel]:
-        if command == develop and not wrap_develop:
-            continue
-        if command in [sdist, bdist_wheel] and not wrap_dist:
-            continue
-
-        name = command.__name__
-        prename = f'pre_{name}'
-
-        class Prebuild(BaseCommand):
-            def run(self):
-                build_func()
-
-        cmdclass[prename] = Prebuild
-
-        def _make_wrapper(klass):
-            class _Wrapped(klass):
-                def run(self):
-                    self.run_command(prename)
-                    klass.run(self)
-            return _Wrapped
-        cmdclass[name] = _make_wrapper(command)
-    return cmdclass
 
 # ---------------------------------------------------------------------------
 # Utility Functions
@@ -552,6 +552,8 @@ def install_npm(path=None, build_dir=None, source_dir=None, build_cmd='build',
 # Private Functions
 # ---------------------------------------------------------------------------
 
+@deprecated(deprecated_in="0.8", removed_in="1.0", current_version=__version__,
+            details="Use `npm_builder` and `wrap_installers`")
 def _wrap_command(cmds, cls, strict=True):
     """Wrap a setup command
 
@@ -581,6 +583,8 @@ def _wrap_command(cmds, cls, strict=True):
     return WrappedCommand
 
 
+@deprecated(deprecated_in="0.8", removed_in="1.0", current_version=__version__,
+            details="Use `npm_builder` and `wrap_installers`")
 def _get_file_handler(package_data_spec, data_files_spec, exclude=None):
     """Get a package_data and data_files handler command.
     """
@@ -603,6 +607,8 @@ def _get_file_handler(package_data_spec, data_files_spec, exclude=None):
     return FileHandler
 
 
+@deprecated(deprecated_in="0.8", removed_in="1.0", current_version=__version__,
+            details="Use `npm_builder` and `wrap_installers`")
 def _get_develop_handler():
     """Get a handler for the develop command"""
     class _develop(develop):
@@ -724,6 +730,8 @@ def _get_files(file_patterns, top=None):
     return list(files)
 
 
+@deprecated(deprecated_in="0.8", removed_in="1.0", current_version=__version__,
+            details="Use `npm_builder` and `wrap_installers`")
 def _get_package_data(root, file_patterns=None):
     """Expand file patterns to a list of `package_data` paths.
 

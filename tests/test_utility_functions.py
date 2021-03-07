@@ -49,7 +49,7 @@ def test_ensure_missing_targets(source_dir):
         run_command(cmd)
 
 
-class TestCommand(BaseCommand):
+class TestCommand(pkg.BaseCommand):
     def run(self):
       raise RuntimeError()
 
@@ -60,13 +60,13 @@ TestCommand.__test__ = False
 def test_skip_existing(destination_dir):
     local_targets = ['file1.rtf', 'sub/subfile1.rtf']
     targets = [str(destination_dir.join(t)) for t in local_targets]
-    cmd = skip_if_exists(targets, TestCommand)
+    cmd = pkg.skip_if_exists(targets, TestCommand)
     run_command(cmd)
 
 
 def test_no_skip_missing(source_dir):
     local_targets = ['file1.rtf', 'sub/subfile1.rtf']
     targets = [str(source_dir.join(t)) for t in local_targets]
-    cmd = skip_if_exists(targets, TestCommand)
+    cmd = pkg.skip_if_exists(targets, TestCommand)
     with pytest.raises(RuntimeError):
         run_command(cmd)

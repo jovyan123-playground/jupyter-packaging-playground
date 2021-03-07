@@ -1,7 +1,8 @@
 import os
+from unittest.mock import patch, call
 
 import pytest
-from unittest.mock import patch, call
+from setuptools.dist import Distribution
 
 from jupyter_packaging.setupbase import npm_builder, wrap_installers
 
