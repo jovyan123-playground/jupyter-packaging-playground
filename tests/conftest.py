@@ -1,8 +1,14 @@
 import os
 import pathlib
 from pytest import fixture
+from subprocess import run
 
 HERE = pathlib.Path(__file__).resolve()
+
+
+@fixture(scope="session", autouse=True)
+def clear_pip_cache():
+    run(['python', '-m', 'pip', 'cache', 'remove', 'jupyter_packaging'])
 
 
 @fixture

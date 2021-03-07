@@ -56,7 +56,7 @@ else:
         return ' '.join(map(pipes.quote, cmd_list))
 
 
-__version__ = '0.7.13'
+__version__ = '0.7.12'
 
 # ---------------------------------------------------------------------------
 # Top Level Variables
@@ -73,7 +73,7 @@ else:
 
 
 # ---------------------------------------------------------------------------
-# Public Functions
+# Core Functions
 # ---------------------------------------------------------------------------
 
 def npm_builder(path=None, build_dir=None, source_dir=None, build_cmd='build',
@@ -204,6 +204,10 @@ def get_data_files(data_specs, *, top=None, exclude=None):
     """
     return _get_data_files(data_specs, None, top=top, exclude=exclude)
 
+
+# ---------------------------------------------------------------------------
+# Utility Functions
+# ---------------------------------------------------------------------------
 
 def get_version(fpath, name='__version__'):
     """Get the version of the package from the given file by extracting the given `name`.

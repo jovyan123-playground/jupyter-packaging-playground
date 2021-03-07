@@ -3,6 +3,8 @@
 import functools
 import importlib
 from pathlib import Path
+import os
+import sys
 
 from setuptools.build_meta import (
     get_requires_for_build_wheel,
@@ -47,7 +49,17 @@ def _get_build_func():
 
     func_data = section['builder']['func']
     mod_name, _, func_name = func_data.rpartition('.')
-    mod = importlib.import_module(mod_name)
+
+    # If the module fails to import, try importing as a local script
+    try:
+        mod = importlib.import_module(mod_name)
+    except ImportError:
+        try:
+            sys.path.insert(0, os.getcwd())
+            mod = importlib.import_module(mod_name)
+        finally:
+            sys.path.pop(0)
+
     func = getattr(mod, func_name)
     kwargs = section.get('build-args', {})
     return functools.partial(func, **kwargs)
