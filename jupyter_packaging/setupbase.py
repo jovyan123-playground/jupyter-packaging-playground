@@ -230,7 +230,7 @@ def run(cmd, **kwargs):
     """Echo a command before running it."""
     log.info('> ' + list2cmdline(cmd))
     kwargs.setdefault('shell', os.name == 'nt')
-    if not isinstance(cmd, (list, tuple)) and os.name != 'nt':
+    if not isinstance(cmd, (list, tuple)):
         cmd = shlex.split(cmd)
     cmd_path = which(cmd[0])
     if not cmd_path:
