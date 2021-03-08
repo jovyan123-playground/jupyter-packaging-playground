@@ -108,3 +108,21 @@ def test_command_for_func():
 def test_install_npm():
     builder = pkg.install_npm()
     assert issubclass(builder, pkg.BaseCommand)
+
+
+def test__wrap_command():
+    called = False
+    def func(self, cmd):
+        nonlocal called
+        called = True
+
+    class TestCommand(pkg.BaseCommand):
+        def run(self):
+            pass
+
+    cmd = pkg._wrap_command(['js'], TestCommand)
+    cmd.run_command = func
+    dist = Distribution()
+    cmd(dist).run()
+    assert called == True
+

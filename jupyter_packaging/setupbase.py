@@ -46,10 +46,10 @@ from setuptools.command.bdist_egg import bdist_egg
 
 try:
     from wheel.bdist_wheel import bdist_wheel
-except ImportError:
+except ImportError:  # pragma: no cover
     bdist_wheel = None
 
-if sys.platform == 'win32':
+if sys.platform == 'win32':   # pragma: no cover
     from subprocess import list2cmdline
 else:
     def list2cmdline(cmd_list):
