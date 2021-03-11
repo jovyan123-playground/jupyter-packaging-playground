@@ -49,12 +49,12 @@ def test_ensure_missing_targets(source_dir):
         run_command(cmd)
 
 
-def test_ensure_with_skip_npm(source_dir):
-    with patch('jupyter_packaging.setupbase.skip_npm', True):
-        local_targets = ['file1.rtf', 'sub/subfile1.rtf']
-        targets = [str(source_dir.join(t)) for t in local_targets]
-        cmd = pkg.ensure_targets(targets)
-        run_command(cmd)
+def test_ensure_with_skip_npm(source_dir, mocker):
+    mocker.patch('jupyter_packaging.setupbase.skip_npm', True)
+    local_targets = ['file1.rtf', 'sub/subfile1.rtf']
+    targets = [str(source_dir.join(t)) for t in local_targets]
+    cmd = pkg.ensure_targets(targets)
+    run_command(cmd)
 
 
 class TestCommand(pkg.BaseCommand):

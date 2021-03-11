@@ -29,65 +29,65 @@ bar = "foo.main"
 
 def test_build_wheel_no_toml(tmp_path):
     os.chdir(tmp_path)
-    with patch('jupyter_packaging.build_api.orig_build_wheel') as orig_wheel:
-        build_wheel(tmp_path)
-        orig_wheel.assert_called_with(tmp_path, config_settings=None, metadata_directory=None)
+    orig_wheel = patch('jupyter_packaging.build_api.orig_build_wheel')
+    build_wheel(tmp_path)
+    orig_wheel.assert_called_with(tmp_path, config_settings=None, metadata_directory=None)
 
 
-def test_build_wheel(tmp_path):
+def test_build_wheel(tmp_path, mocker):
     os.chdir(tmp_path)
     tmp_path.joinpath('foo.py').write_text(FOO_CONTENT)
     tmp_path.joinpath('pyproject.toml').write_text(TOML_CONTENT, encoding='utf-8')
-    with patch('jupyter_packaging.build_api.orig_build_wheel') as orig_wheel:
-        build_wheel(tmp_path)
-        orig_wheel.assert_called_with(tmp_path, config_settings=None, metadata_directory=None)
-        data = tmp_path.joinpath('foo.txt').read_text(encoding='utf-8')
-        assert data == 'fizz=buzz'
+    orig_wheel = mocker.patch('jupyter_packaging.build_api.orig_build_wheel')
+    build_wheel(tmp_path)
+    orig_wheel.assert_called_with(tmp_path, config_settings=None, metadata_directory=None)
+    data = tmp_path.joinpath('foo.txt').read_text(encoding='utf-8')
+    assert data == 'fizz=buzz'
 
 
-def test_build_wheel_bad_toml(tmp_path):
+def test_build_wheel_bad_toml(tmp_path, mocker):
     os.chdir(tmp_path)
     tmp_path.joinpath('foo.py').write_text(FOO_CONTENT)
     tmp_path.joinpath('pyproject.toml').write_text(BAD_CONTENT, encoding='utf-8')
-    with patch('jupyter_packaging.build_api.orig_build_wheel') as orig_wheel:
-        with pytest.raises(ValueError):
-            build_wheel(tmp_path)
-        orig_wheel.assert_not_called()
-
-
-def test_build_wheel_no_toml(tmp_path):
-    os.chdir(tmp_path)
-    with patch('jupyter_packaging.build_api.orig_build_wheel') as orig_wheel:
+    orig_wheel = mocker.patch('jupyter_packaging.build_api.orig_build_wheel')
+    with pytest.raises(ValueError):
         build_wheel(tmp_path)
-        orig_wheel.assert_called_with(tmp_path, config_settings=None, metadata_directory=None)
+    orig_wheel.assert_not_called()
 
 
-def test_build_sdist(tmp_path):
+def test_build_wheel_no_toml(tmp_path, mocker):
+    os.chdir(tmp_path)
+    orig_wheel = mocker.patch('jupyter_packaging.build_api.orig_build_wheel')
+    build_wheel(tmp_path)
+    orig_wheel.assert_called_with(tmp_path, config_settings=None, metadata_directory=None)
+
+
+def test_build_sdist(tmp_path, mocker):
     os.chdir(tmp_path)
     tmp_path.joinpath('foo.py').write_text(FOO_CONTENT)
     tmp_path.joinpath('pyproject.toml').write_text(TOML_CONTENT, encoding='utf-8')
-    with patch('jupyter_packaging.build_api.orig_build_sdist') as orig_sdist:
-        build_sdist(tmp_path)
-        orig_sdist.assert_called_with(tmp_path, config_settings=None)
-        data = tmp_path.joinpath('foo.txt').read_text(encoding='utf-8')
-        assert data == 'fizz=buzz'
+    orig_sdist = mocker.patch('jupyter_packaging.build_api.orig_build_sdist')
+    build_sdist(tmp_path)
+    orig_sdist.assert_called_with(tmp_path, config_settings=None)
+    data = tmp_path.joinpath('foo.txt').read_text(encoding='utf-8')
+    assert data == 'fizz=buzz'
 
 
-def test_build_sdist_bad_toml(tmp_path):
+def test_build_sdist_bad_toml(tmp_path, mocker):
     os.chdir(tmp_path)
     tmp_path.joinpath('foo.py').write_text(FOO_CONTENT)
     tmp_path.joinpath('pyproject.toml').write_text(BAD_CONTENT, encoding='utf-8')
-    with patch('jupyter_packaging.build_api.orig_build_sdist') as orig_sdist:
-        with pytest.raises(ValueError):
-            build_sdist(tmp_path)
-        orig_sdist.assert_not_called()
-
-
-def test_build_sdist_no_toml(tmp_path):
-    os.chdir(tmp_path)
-    with patch('jupyter_packaging.build_api.orig_build_sdist') as orig_sdist:
+    orig_sdist = mocker.patch('jupyter_packaging.build_api.orig_build_sdist')
+    with pytest.raises(ValueError):
         build_sdist(tmp_path)
-        orig_sdist.assert_called_with(tmp_path, config_settings=None)
+    orig_sdist.assert_not_called()
+
+
+def test_build_sdist_no_toml(tmp_path, mocker):
+    os.chdir(tmp_path)
+    orig_sdist = mocker.patch('jupyter_packaging.build_api.orig_build_sdist')
+    build_sdist(tmp_path)
+    orig_sdist.assert_called_with(tmp_path, config_settings=None)
 
 
 def test_build_package(make_package):

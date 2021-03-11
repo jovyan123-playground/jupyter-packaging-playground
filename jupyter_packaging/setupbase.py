@@ -110,7 +110,7 @@ def wrap_installers(prebuild_func, *, wrap_develop=True, wrap_dist=True):
 
         class Prebuild(BaseCommand):
             def run(self):
-                build_func()
+                prebuild_func()
 
         cmdclass[prename] = Prebuild
 

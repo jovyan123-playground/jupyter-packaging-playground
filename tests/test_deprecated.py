@@ -60,7 +60,7 @@ def test_ensure_python():
         pkg.ensure_python('<3.5')
 
 
-def test_create_cmdclass(make_package_deprecated):
+def test_create_cmdclass(make_package_deprecated, mocker):
     source = ("share/test.txt",)
     spec =  ("jupyter-packaging-test", "share", "**/*")
     target = "jupyter-packaging-test/test.txt"
@@ -88,10 +88,10 @@ def test_create_cmdclass(make_package_deprecated):
     def run_command(name):
         cmdclass[name](dist).run()
 
-    with patch.object(pkg.develop, 'install_for_development'):
-        develop.run_command = run_command
-        develop.install_for_development()
-        assert dist.data_files == [('jupyter-packaging-test', ['share/test.txt'])]
+    mocker.patch.object(pkg.develop, 'install_for_development')
+    develop.run_command = run_command
+    develop.install_for_development()
+    assert dist.data_files == [('jupyter-packaging-test', ['share/test.txt'])]
 
 
 def test_command_for_func():
