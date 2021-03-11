@@ -76,7 +76,7 @@ else:
 # Core Functions
 # ---------------------------------------------------------------------------
 
-def wrap_installers(build_func, *, wrap_develop=True, wrap_dist=True):
+def wrap_installers(prebuild_func, *, wrap_develop=True, wrap_dist=True):
     """Make a setuptools cmdclass that calls a prebuild function before installing.
 
     Parameters
