@@ -81,7 +81,7 @@ def wrap_installers(prebuild_func, *, wrap_develop=True, wrap_dist=True):
 
     Parameters
     ----------
-    build_func : function
+    prebuild_func : function
         The function to call in the prebuild step
     wrap_develop: bool, optional
         Whether to wrap the develop command.
