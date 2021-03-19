@@ -76,22 +76,24 @@ else:
 # Core Functions
 # ---------------------------------------------------------------------------
 
-def wrap_installers(prebuild_func, *, wrap_develop=True, wrap_dist=True):
+def wrap_installers(pre_develop=None, pre_dist=None, post_develop=None, post_dist=None):
     """Make a setuptools cmdclass that calls a prebuild function before installing.
 
     Parameters
     ----------
-    prebuild_func : function
-        The function to call in the prebuild step
-    wrap_develop: bool, optional
-        Whether to wrap the develop command.
-    wrap_dist: bool, optional
-        Whether to wrap the dist commands.
+    pre_develop: function
+        The function to call prior to the develop command.
+    pre_dist: function
+        The function to call prior to the sdist and wheel commands
+    post_develop: function
+        The function to call after the develop command.
+    post_dist: function
+        The function to call after the sdist and wheel commands.
 
     Notes
     -----
-    For any wrapped command, creates a new `pre_` command that can be run separately.
-    These would be `pre_develop`, `pre_sdist`, and `pre_bdist_wheel`.
+    For any function given, creates a new `setuptools` command that can be run separately,
+    e.g. `python setup.py pre_develop`.
 
     Returns
     -------
@@ -99,28 +101,35 @@ def wrap_installers(prebuild_func, *, wrap_develop=True, wrap_dist=True):
     """
     cmdclass = {}
 
-    for command in [develop, sdist, bdist_wheel]:
-        if command == develop and not wrap_develop:
-            continue
-        if command in [sdist, bdist_wheel] and not wrap_dist:
-            continue
-
-        name = command.__name__
-        prename = f'pre_{name}'
-
-        class Prebuild(BaseCommand):
+    def _make_command(name, func):
+        class _Wrapped(BaseCommand):
             def run(self):
-                prebuild_func()
+                func()
 
-        cmdclass[prename] = Prebuild
+        _Wrapped.__name__ = name
+        cmdclass[name] = _Wrapped
 
-        def _make_wrapper(klass):
-            class _Wrapped(klass):
-                def run(self):
-                    self.run_command(prename)
-                    klass.run(self)
-            return _Wrapped
-        cmdclass[name] = _make_wrapper(command)
+    for name in ['pre_develop', 'post_develop', 'pre_dist', 'post_dist']:
+        if locals()[name]:
+            _make_command(name, locals()[name])
+
+    def _make_wrapper(klass, pre_build, post_build):
+        class _Wrapped(klass):
+            def run(self):
+                if pre_build:
+                    self.run_command(pre_build.__name__)
+                klass.run(self)
+                if post_build:
+                    self.run_command(post_build.__name__)
+        cmdclass[klass.__name__] = _Wrapped
+
+    if pre_develop or post_develop:
+        _make_wrapper(develop, pre_develop, post_develop)
+
+    if pre_dist or post_dist:
+        _make_wrapper(sdist, pre_dist, post_dist)
+        _make_wrapper(bdist_wheel, pre_dist, post_dist)
+
     return cmdclass
 
 

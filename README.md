@@ -31,7 +31,8 @@ from setuptools import setup
 
 try:
     from jupyter_packaging import wrap_installers, npm_builder
-    cmdclass = wrap_installers(npm_builder())
+    builder = npm_builder()
+    cmdclass = wrap_installers(pre_develop=builder, pre_dist=builder)
 except ImportError:
     cmdclass = {}
 
@@ -69,7 +70,7 @@ The optional `tool.jupyter-packaging.build-args` sections accepts a dict of keyw
 give to the pre-build command.
 
 The build backend does not handle the `develop` command (`pip install -e .`).
-If desired, you can wrap just that command (note the use of `wrap_dist=False`):
+If desired, you can wrap just that command:
 
 ```py
 import setuptools
@@ -77,7 +78,7 @@ import setuptools
 try:
     from jupyter_packaging import wrap_installers, npm_builder
     builder = npm_builder(build_cmd="build:dev")
-    cmdclass = wrap_installers(builder, wrap_dist=False)
+    cmdclass = wrap_installers(pre_develop=builder)
 except ImportError:
     cmdclass = {}
 
@@ -91,7 +92,8 @@ Vendor `setupbase.py` locally alongside `setup.py` and import the module directl
 ```py
 import setuptools
 from setupbase import wrap_installers, npm_builder
-cmdclass = wrap_installers(npm_builder())
+builder = npm_builder
+cmdclass = wrap_installers(post_develop=builder, pre_dist=builder)
 setup(cmdclass=cmdclass)
 ```
 

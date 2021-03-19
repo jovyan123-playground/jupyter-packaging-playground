@@ -13,9 +13,13 @@ def test_wrap_installers():
         nonlocal called
         called = True
 
-    cmd_class = wrap_installers(func)
-    cmd_class['pre_sdist'](Distribution()).run()
-    assert called
+    cmd_class = wrap_installers(pre_dist=func, pre_develop=func,
+        post_dist=func, post_develop=func)
+
+    for name in ['pre_dist', 'pre_develop', 'post_dist', 'post_develop']:
+        cmd_class[name](Distribution()).run()
+        assert called
+        called = False
 
 
 def test_npm_builder(mocker):
