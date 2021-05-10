@@ -122,8 +122,8 @@ def wrap_installers(pre_develop=None, pre_dist=None, post_develop=None, post_dis
 
     cmdclass['ensure_targets'] = ensure_targets(ensured_targets or [])
 
-    skip_if_exists = skip_if_exists or []
-    should_skip = all(Path(path).exists() for path in skip_if_exists)
+    skips = skip_if_exists or []
+    should_skip = skips and all(Path(path).exists() for path in skips)
 
     def _make_wrapper(klass, pre_build, post_build):
         class _Wrapped(klass):
@@ -250,18 +250,6 @@ def get_version(fpath, name='__version__'):
     with io.open(path, encoding="utf8") as f:
         exec(f.read(), {}, version_ns)
     return version_ns[name]
-
-
-def get_version_info(version_str):
-    """Get a version info tuple given a version string"""
-    match = VERSION_REGEX.match(version_str)
-    if not match:
-        raise ValueError(f'Invalid version "{version_str}"')
-    release = match['release']
-    version_info = [int(p) for p in release.split('.')]
-    if release != version_str:
-        version_info.append(version_str[len(release):])
-    return tuple(version_info)
 
 
 def run(cmd, **kwargs):
@@ -418,6 +406,38 @@ def ensure_targets(targets):
 # ---------------------------------------------------------------------------
 # Deprecated Functions
 # ---------------------------------------------------------------------------
+
+@deprecated(deprecated_in="0.11", removed_in="2.0", current_version=__version__,
+            details="Parse the version info as described in `get_version_info` docstring")
+def get_version_info(version_str):
+    """DEPRECATED: Get a version info tuple given a version string
+
+    Use something like the following instead:
+
+    ```
+    import re
+
+    # Version string must appear intact for tbump versioning
+    __version__ = '1.4.0.dev0'
+
+    # Build up version_info tuple for backwards compatibility
+    pattern = r'(?P<major>\d+).(?P<minor>\d+).(?P<patch>\d+)(?P<rest>.*)'
+    match = re.match(pattern, __version__)
+    parts = [int(match[part]) for part in ['major', 'minor', 'patch']]
+    if match['rest']:
+    parts.append(match['rest'])
+    version_info = tuple(parts)
+    ```
+    """
+    match = VERSION_REGEX.match(version_str)
+    if not match:
+        raise ValueError(f'Invalid version "{version_str}"')
+    release = match['release']
+    version_info = [int(p) for p in release.split('.')]
+    if release != version_str:
+        version_info.append(version_str[len(release):])
+    return tuple(version_info)
+
 
 @deprecated(deprecated_in="0.8", removed_in="1.0", current_version=__version__,
             details="Use `BaseCommand` directly instead")
