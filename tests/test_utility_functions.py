@@ -1,4 +1,5 @@
-
+import os
+import sys
 from unittest.mock import patch
 import pytest
 
@@ -28,7 +29,8 @@ def test_combine_commands():
 
 
 def test_run():
-    assert pkg.run('python --version') == 0
+    python = sys.executable.replace(os.sep, '/')
+    assert pkg.run(f'{python} --version') == 0
 
     with pytest.raises(ValueError):
         pkg.run('foobarbaz')
